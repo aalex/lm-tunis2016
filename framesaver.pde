@@ -5,31 +5,23 @@
 boolean is_recording = false;
 static final int NUM_FRAMES = 30;
 int frame_drawn = 0;
+FramesWriter writer;
 
 void setup()
 {
   size(1280, 780);
+  writer = new FramesWriter(NUM_FRAMES);
 }
 
 void draw()
 {
   background(0);
   
-  draw_something(frame_drawn, NUM_FRAMES);
-  frame_drawn += 1;
-  
-  if (is_recording) {
-    saveFrame("output/frames####.png"); // sharps are replaced by the frame number
-  }
-  
-  if (frame_drawn == NUM_FRAMES)
-  {
-    is_recording = false;
-  }
-  
+  draw_something(writer.get_frames_drawn(), NUM_FRAMES);
+  writer.save_frame_if_recording();
   // -------------------------------
   // What is after the call to saveFrame will not be drawn in the output images.  
-  draw_recording_state(is_recording);
+  writer.draw_recording_state();
 }
 
 
@@ -53,40 +45,6 @@ void keyPressed()
   // If we press r, start or stop recording!
   if (key == 'r' || key == 'R')
   {
-    start_recording();
+    writer.start_recording();
   }
-}
-
-
-void start_recording()
-{
-  frame_drawn = 0;
-  is_recording = true;
-}
-
-void draw_recording_state(boolean recording)
-{
-  textAlign(CENTER);
-  fill(255);
-  if (recording)
-  {
-    text("Press r to stop recording.", width / 2, height - 24);
-  } 
-  else
-  {
-    text("Press r to start recording.", width / 2, height - 24);
-  }
-
-  text("Frame " + frame_drawn, width / 2, height - 30);
-  // A red dot for when we are recording
-  stroke(255);
-  if (recording)
-  {
-    fill(255, 0, 0);
-  }
-  else
-  { 
-    noFill();
-  }
-  ellipse(width / 2, height - 48, 16, 16);
 }
